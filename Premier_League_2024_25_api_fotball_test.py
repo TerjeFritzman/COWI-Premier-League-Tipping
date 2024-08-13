@@ -38,17 +38,22 @@ def get_live_table(season="2024"):
     
     if response.status_code == 200:
         data = response.json()
-        standings = data['response'][0]['league']['standings'][0]
-        table = pd.DataFrame(standings)
-        table = table[['rank', 'team', 'points', 'all']]
-        table.columns = ['Position', 'Team', 'Points', 'All']
-        table['Team'] = table['Team'].apply(lambda x: x['name'])
-        table['Played'] = table['All'].apply(lambda x: x['played'])
-        table['Won'] = table['All'].apply(lambda x: x['win'])
-        table['Draw'] = table['All'].apply(lambda x: x['draw'])
-        table['Lost'] = table['All'].apply(lambda x: x['lose'])
-        table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
-        return table
+        # Check if 'response' key exists and is not empty
+        if 'response' in data and len(data['response']) > 0:
+            standings = data['response'][0]['league']['standings'][0]
+            table = pd.DataFrame(standings)
+            table = table[['rank', 'team', 'points', 'all']]
+            table.columns = ['Position', 'Team', 'Points', 'All']
+            table['Team'] = table['Team'].apply(lambda x: x['name'])
+            table['Played'] = table['All'].apply(lambda x: x['played'])
+            table['Won'] = table['All'].apply(lambda x: x['win'])
+            table['Draw'] = table['All'].apply(lambda x: x['draw'])
+            table['Lost'] = table['All'].apply(lambda x: x['lose'])
+            table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
+            return table
+        else:
+            st.error("No standings data available.")
+            return pd.DataFrame()
     else:
         st.error("Failed to fetch data.")
         return pd.DataFrame()

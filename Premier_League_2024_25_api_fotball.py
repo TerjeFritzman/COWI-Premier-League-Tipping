@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
-
-# from config import API_football_API_Key
+from datetime import datetime, timedelta
 
 # Set page configuration to use wide layout
 st.set_page_config(layout='wide')
@@ -24,6 +23,7 @@ points_system = {
 }
 
 # Function to get live Premier League table from API-Football
+@st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
 def get_live_table(season="2024"):
     url = "https://v3.football.api-sports.io/standings"
     headers = {
@@ -52,6 +52,9 @@ def get_live_table(season="2024"):
     else:
         st.error("Failed to fetch data.")
         return pd.DataFrame()
+
+# Fetch the live table (this will use the cache if available)
+live_table = get_live_table(season="2024")
 
 # Sample predictions data using the provided teams
 predictions_data = {
@@ -116,7 +119,6 @@ col1, col2 = st.columns([1, 2])
 # Display live table in the first column
 with col1:
     st.header('Nåværende stilling')
-    live_table = get_live_table(season="2024")
     if not live_table.empty:
         st.dataframe(live_table.set_index('Position'), height=738, width=600)
     else:
