@@ -130,8 +130,20 @@ col1, col2 = st.columns([1, 2])
 # Display live table in the first column
 with col1:
     st.header('Nåværende stilling')
+    live_table = get_live_table(season="2024")
     if not live_table.empty:
-        st.dataframe(live_table.set_index('Position'), height=738, width=600)
+        st.dataframe(live_table.set_index('Position'), height=738, width=600)        
+        with st.expander("Trykk her for å se poengsystemet"):
+            # Create a DataFrame from the points_system dictionary
+            points_system_df = pd.DataFrame(list(points_system.items()), columns=['Posisjon', 'Poeng'])
+            # Create a new DataFrame with just the 'Poeng' column
+            points_only_df = points_system_df[['Poeng']].copy()
+            # Set a custom index
+            points_only_df.index = list(range(1, len(points_only_df) + 1))
+            # Rename the index column
+            points_only_df.index.name = 'Index'
+            # Display the table
+            st.table(points_only_df)
     else:
         st.write("No data to display.")
 

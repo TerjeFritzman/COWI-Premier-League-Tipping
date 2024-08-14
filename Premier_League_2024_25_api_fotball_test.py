@@ -7,8 +7,6 @@ from config import API_football_API_Key
 # Set page configuration to use wide layout
 st.set_page_config(layout='wide')
 
-# API_football_API_Key = st.secrets['API_football_API_Key']
-
 # Define the points system based on ranking
 points_system = {
     1: 10,
@@ -123,7 +121,18 @@ with col1:
     st.header('Nåværende stilling')
     live_table = get_live_table(season="2024")
     if not live_table.empty:
-        st.dataframe(live_table.set_index('Position'), height=738, width=600)
+        st.dataframe(live_table.set_index('Position'), height=738, width=600)        
+        with st.expander("Trykk her for å se poengsystemet"):
+            # Create a DataFrame from the points_system dictionary
+            points_system_df = pd.DataFrame(list(points_system.items()), columns=['Posisjon', 'Poeng'])
+            # Create a new DataFrame with just the 'Poeng' column
+            points_only_df = points_system_df[['Poeng']].copy()
+            # Set a custom index
+            points_only_df.index = list(range(1, len(points_only_df) + 1))
+            # Rename the index column
+            points_only_df.index.name = 'Index'
+            # Display the table
+            st.table(points_only_df)
     else:
         st.write("No data to display.")
 
@@ -149,7 +158,7 @@ with col2:
 
     # Add padding to the index labels to make them wider
     def pad_index(index):
-        return [f"{str(val): <6}" for val in index]
+        return [f"{str(val): <10}" for val in index]
 
     # Apply the style to the full dataframe (including the matching row)
     def highlight_matching_teams(s):
