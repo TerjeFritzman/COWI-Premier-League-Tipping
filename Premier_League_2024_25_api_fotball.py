@@ -87,6 +87,18 @@ predictions_data = {
         "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
         "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
     ],
+    "Arvid": [
+        "Arsenal", "Liverpool", "Chelsea", "Manchester City", "Tottenham",
+        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
+        "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
+        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
+    ],
+    "Anders": [
+        "Arsenal", "Liverpool", "Chelsea", "Manchester City", "Tottenham",
+        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
+        "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
+        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
+    ],
     "Fasit": [
         "Arsenal", "Aston Villa", "Chelsea", "Everton", "Fulham",
         "Liverpool", "Manchester City", "Manchester United", "Newcastle", "Tottenham",
