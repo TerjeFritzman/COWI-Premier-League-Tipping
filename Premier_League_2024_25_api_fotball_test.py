@@ -147,10 +147,18 @@ with col2:
     custom_index = list(range(1, 21)) + ["# Riktig", "Sum poeng"]
     full_predictions_df.index = custom_index
 
+    # Add padding to the index labels to make them wider
+    def pad_index(index):
+        return [f"{str(val): <6}" for val in index]
+
     # Apply the style to the full dataframe (including the matching row)
     def highlight_matching_teams(s):
         min_length = min(len(s), len(live_table['Team']))
         return ['background-color: green' if s.iloc[i] == live_table['Team'].iloc[i] else '' for i in range(min_length)] + [''] * (len(s) - min_length)
+
+    # Pad the custom index values to make them wider
+    custom_index = pad_index(list(range(1, 21)) + ["# Riktig", "Sum poeng"])
+    full_predictions_df.index = custom_index
 
     styled_full_predictions_df = full_predictions_df.style.apply(highlight_matching_teams, axis=0)
 
