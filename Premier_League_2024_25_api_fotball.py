@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import requests
-from datetime import datetime, timedelta
 
 # Set page configuration to use wide layout
 st.set_page_config(layout='wide')
@@ -142,7 +141,7 @@ with col2:
 
     # Add padding to the index labels to make them wider
     def pad_index(index):
-        return [f"{str(val): <6}" for val in index]
+        return [f"{str(val): <10}" for val in index]
 
     # Apply the style to the full dataframe (including the matching row)
     def highlight_matching_teams(s):
