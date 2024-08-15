@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 from predictions import predictions_data
 
+# from config import API_football_API_Key
+
 # Set page configuration to use wide layout
 st.set_page_config(layout='wide')
 
@@ -38,23 +40,25 @@ def get_live_table(season="2024"):
     
     if response.status_code == 200:
         data = response.json()
-        standings = data['response'][0]['league']['standings'][0]
-        table = pd.DataFrame(standings)
-        table = table[['rank', 'team', 'points', 'all']]
-        table.columns = ['Position', 'Team', 'Points', 'All']
-        table['Team'] = table['Team'].apply(lambda x: x['name'])
-        table['Played'] = table['All'].apply(lambda x: x['played'])
-        table['Won'] = table['All'].apply(lambda x: x['win'])
-        table['Draw'] = table['All'].apply(lambda x: x['draw'])
-        table['Lost'] = table['All'].apply(lambda x: x['lose'])
-        table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
-        return table
+        # Check if 'response' key exists and is not empty
+        if 'response' in data and len(data['response']) > 0:
+            standings = data['response'][0]['league']['standings'][0]
+            table = pd.DataFrame(standings)
+            table = table[['rank', 'team', 'points', 'all']]
+            table.columns = ['Position', 'Team', 'Points', 'All']
+            table['Team'] = table['Team'].apply(lambda x: x['name'])
+            table['Played'] = table['All'].apply(lambda x: x['played'])
+            table['Won'] = table['All'].apply(lambda x: x['win'])
+            table['Draw'] = table['All'].apply(lambda x: x['draw'])
+            table['Lost'] = table['All'].apply(lambda x: x['lose'])
+            table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
+            return table
+        else:
+            st.error("No standings data available.")
+            return pd.DataFrame()
     else:
         st.error("Failed to fetch data.")
         return pd.DataFrame()
-
-# Fetch the live table (this will use the cache if available)
-live_table = get_live_table(season="2024")
 
 # Convert predictions to DataFrame
 predictions_df = pd.DataFrame(predictions_data)
@@ -82,17 +86,6 @@ with col1:
     live_table = get_live_table(season="2024")
     if not live_table.empty:
         st.dataframe(live_table.set_index('Position'), height=738, width=600)        
-        with st.expander("Trykk her for å se poengsystemet"):
-            # Create a DataFrame from the points_system dictionary
-            points_system_df = pd.DataFrame(list(points_system.items()), columns=['Posisjon', 'Poeng'])
-            # Create a new DataFrame with just the 'Poeng' column
-            points_only_df = points_system_df[['Poeng']].copy()
-            # Set a custom index
-            points_only_df.index = list(range(1, len(points_only_df) + 1))
-            # Rename the index column
-            points_only_df.index.name = 'Index'
-            # Display the table
-            st.table(points_only_df)
     else:
         st.write("No data to display.")
 
@@ -112,6 +105,10 @@ with col2:
     # Concatenate the predictions, correct predictions, and points
     full_predictions_df = pd.concat([predictions_df, matching_teams_df, points_df.T])
 
+    # Reintroduce the custom index numbers
+    custom_index = list(range(1, 21)) + ["# Riktig", "Sum poeng"]
+    full_predictions_df.index = custom_index
+
     # Add padding to the index labels to make them wider
     def pad_index(index):
         return [f"{str(val): <10}" for val in index]
@@ -128,3 +125,32 @@ with col2:
     styled_full_predictions_df = full_predictions_df.style.apply(highlight_matching_teams, axis=0)
 
     st.dataframe(styled_full_predictions_df, height=738+34+34+1, width=1500)
+
+    # Create a column for expanders to align them horizontally
+    expander_col1, expander_col2 = st.columns([1, 1])
+
+    with expander_col1:
+        with st.expander("Trykk for å se Sammenlagt Rangering"):
+            st.header('Sammenlagt Rangering')
+
+            # Rank participants by points in descending order
+            standings_df = points_df.sort_values(by='Sum poeng', ascending=False).reset_index()
+            standings_df.index += 1  # Start index from 1 for ranks
+            standings_df.columns = ['Navn', 'Sum poeng']
+
+            st.table(standings_df)
+
+    with expander_col2:
+        with st.expander("Trykk her for å se Poengsystemet"):
+            st.header('Poengsystem')
+            
+            # Create a DataFrame from the points_system dictionary
+            points_system_df = pd.DataFrame(list(points_system.items()), columns=['Posisjon', 'Poeng'])
+            # Create a new DataFrame with just the 'Poeng' column
+            points_only_df = points_system_df[['Poeng']].copy()
+            # Set a custom index
+            points_only_df.index = list(range(1, len(points_only_df) + 1))
+            # Rename the index column
+            points_only_df.index.name = 'Index'
+            # Display the table
+            st.table(points_only_df)
