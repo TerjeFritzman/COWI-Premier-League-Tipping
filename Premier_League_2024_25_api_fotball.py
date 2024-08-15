@@ -127,4 +127,4 @@ with col2:
 
     styled_full_predictions_df = full_predictions_df.style.apply(highlight_matching_teams, axis=0)
 
-    st.dataframe(styled_full_predictions_df, height=738+34+34+1, width=1000)
+    st.dataframe(styled_full_predictions_df, height=738+34+34+1, width=1500)
