@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+from predictions import predictions_data
 
 from config import API_football_API_Key
 
@@ -55,46 +56,6 @@ def get_live_table(season="2024"):
     else:
         st.error("Failed to fetch data.")
         return pd.DataFrame()
-
-# Sample predictions data using the provided teams
-predictions_data = {
-    "Terje": [
-        "Manchester City", "Aston Villa", "Liverpool", "Chelsea", "Tottenham",
-        "Newcastle", "Manchester United", "Brighton", "West Ham", "Arsenal",
-        "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
-        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
-    ],
-    "Viggo": [
-        "Arsenal", "Liverpool", "Manchester City", "Chelsea", "Tottenham",
-        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
-        "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
-        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
-    ],
-    "Christoffer": [
-        "Arsenal", "Liverpool", "Manchester City", "Chelsea", "Tottenham",
-        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
-        "Ipswich", "Everton", "Crystal Palace", "Fulham", "Wolves",
-        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Brentford"
-    ],
-    "William": [
-        "Arsenal", "Liverpool", "Manchester City", "Everton", "Tottenham",
-        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
-        "Brentford", "Chelsea", "Crystal Palace", "Fulham", "Wolves",
-        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
-    ],
-    "Mads": [
-        "Arsenal", "Liverpool", "Chelsea", "Manchester City", "Tottenham",
-        "Manchester United", "Newcastle", "Brighton", "Aston Villa", "West Ham",
-        "Brentford", "Everton", "Crystal Palace", "Fulham", "Wolves",
-        "Bournemouth", "Leicester", "Nottingham Forest", "Southampton", "Ipswich"
-    ],
-    "Fasit": [
-        "Arsenal", "Aston Villa", "Chelsea", "Everton", "Fulham",
-        "Liverpool", "Manchester City", "Manchester United", "Newcastle", "Tottenham",
-        "West Ham", "Crystal Palace", "Ipswich", "Leicester", "Southampton",
-        "Wolves", "Bournemouth", "Brighton", "Nottingham Forest", "Brentford"
-    ]
-}
 
 # Convert predictions to DataFrame
 predictions_df = pd.DataFrame(predictions_data)
@@ -171,4 +132,4 @@ with col2:
 
     styled_full_predictions_df = full_predictions_df.style.apply(highlight_matching_teams, axis=0)
 
-    st.dataframe(styled_full_predictions_df, height=738+34+34+1, width=1000)
+    st.dataframe(styled_full_predictions_df, height=738+34+34+1, width=1500)
