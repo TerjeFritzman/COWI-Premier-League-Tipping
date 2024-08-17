@@ -25,7 +25,7 @@ points_system = {
 }
 
 # Function to get live Premier League table from API-Football
-@st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
+@st.cache_data(ttl=3600, allow_output_mutation=True)  # Cache data for 1 hour (3600 seconds)
 def get_live_table(season="2024"):
     url = "https://v3.football.api-sports.io/standings"
     headers = {
@@ -75,7 +75,7 @@ def calculate_points(predictions, live_table):
     return points
 
 # Streamlit app
-st.title('Premier League Tabell 2024-2025')
+st.title('Premier League Tabell 2024-20252')
 
 # Create two columns
 col1, col2 = st.columns([1, 2])
