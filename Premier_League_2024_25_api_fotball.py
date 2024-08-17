@@ -25,7 +25,7 @@ points_system = {
 }
 
 # Function to get live Premier League table from API-Football
-# @st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
+@st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
 def get_live_table(season="2024"):
     url = "https://v3.football.api-sports.io/standings"
     headers = {

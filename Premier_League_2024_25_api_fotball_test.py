@@ -34,7 +34,7 @@ def get_live_table(season="2024"):
     }
     params = {
         "league": "39",  # Premier League ID
-        "season": season  # Current season
+        "season": season,  # Current season'
     }
     response = requests.get(url, headers=headers, params=params)
     
