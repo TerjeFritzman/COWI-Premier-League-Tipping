@@ -25,12 +25,12 @@ points_system = {
 }
 
 # Function to get live Premier League table from API-Football
-@st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
+# @st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
 def get_live_table(season="2024"):
     url = "https://v3.football.api-sports.io/standings"
     headers = {
         "x-rapidapi-host": "v3.football.api-sports.io",
-        "x-rapidapi-key": API_football_API_Key  # Your actual API key
+        "x-rapidapi-key": API_football_API_Key
     }
     params = {
         "league": "39",  # Premier League ID
@@ -40,6 +40,7 @@ def get_live_table(season="2024"):
     
     if response.status_code == 200:
         data = response.json()
+
         # Check if 'response' key exists and is not empty
         if 'response' in data and len(data['response']) > 0:
             standings = data['response'][0]['league']['standings'][0]
@@ -52,7 +53,10 @@ def get_live_table(season="2024"):
             table['Draw'] = table['All'].apply(lambda x: x['draw'])
             table['Lost'] = table['All'].apply(lambda x: x['lose'])
             table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
-            return table
+            # Extract the update time
+            update_time = standings[0]['update']
+
+            return table, update_time
         else:
             st.error("No standings data available.")
             return pd.DataFrame()
@@ -83,9 +87,11 @@ col1, col2 = st.columns([1, 2])
 # Display live table in the first column
 with col1:
     st.header('Nåværende stilling')
-    live_table = get_live_table(season="2024")
+    live_table, update_time = get_live_table(season="2024")
     if not live_table.empty:
-        st.dataframe(live_table.set_index('Position'), height=738, width=600)        
+        st.dataframe(live_table.set_index('Position'), height=738, width=600)
+        # Display the "update" time beneath the table
+        st.write(f"Data last updated on: {update_time}")      
     else:
         st.write("No data to display.")
 
