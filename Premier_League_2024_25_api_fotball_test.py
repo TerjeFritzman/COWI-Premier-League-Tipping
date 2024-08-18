@@ -48,10 +48,8 @@ def get_live_table():
             table['Draw'] = table['All'].apply(lambda x: x['draw'])
             table['Lost'] = table['All'].apply(lambda x: x['lose'])
             table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
-            # Extract the update time
-            update_time = standings[0]['update']
 
-            return table, update_time
+            return table
         else:
             st.error("No standings data available.")
             return pd.DataFrame()
@@ -82,11 +80,9 @@ col1, col2 = st.columns([1, 2])
 # Display live table in the first column
 with col1:
     st.header('Nåværende stilling')
-    live_table, update_time = get_live_table()
+    live_table = get_live_table()
     if not live_table.empty:
-        st.dataframe(live_table.set_index('Position'), height=738, width=600)
-        # Display the "update" time beneath the table
-        st.write(f"Data last updated on: {update_time}")      
+        st.dataframe(live_table.set_index('Position'), height=738, width=600) 
     else:
         st.write("No data to display.")
 
