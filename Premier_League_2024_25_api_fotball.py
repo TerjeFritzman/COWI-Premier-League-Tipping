@@ -26,17 +26,12 @@ points_system = {
 
 # Function to get live Premier League table from API-Football
 @st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
-def get_live_table(season="2024"):
-    url = "https://v3.football.api-sports.io/standings"
+def get_live_table():
+    url = "https://v3.football.api-sports.io/standings?season=2024&league=39"
     headers = {
-        "x-rapidapi-host": "v3.football.api-sports.io",
-        "x-rapidapi-key": API_football_API_Key
+        "x-apisports-key": API_football_API_Key
     }
-    params = {
-        "league": "39",  # Premier League ID
-        "season": season  # Current season
-    }
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
         data = response.json()
@@ -87,7 +82,7 @@ col1, col2 = st.columns([1, 2])
 # Display live table in the first column
 with col1:
     st.header('Nåværende stilling')
-    live_table, update_time = get_live_table(season="2024")
+    live_table, update_time = get_live_table()
     if not live_table.empty:
         st.dataframe(live_table.set_index('Position'), height=738, width=600)
         # Display the "update" time beneath the table
