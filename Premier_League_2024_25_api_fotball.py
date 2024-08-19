@@ -47,7 +47,12 @@ def get_live_table():
             table['Won'] = table['All'].apply(lambda x: x['win'])
             table['Draw'] = table['All'].apply(lambda x: x['draw'])
             table['Lost'] = table['All'].apply(lambda x: x['lose'])
-            table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Points']]
+            table['Goals For'] = table['All'].apply(lambda x: x['goals']['for'])
+            table['Goals Against'] = table['All'].apply(lambda x: x['goals']['against'])
+            table['Goals'] = table['Goals For'] - table['Goals Against']
+
+            # Rearrange columns to match your required order
+            table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', 'Goals', 'Points']]
  
             return table
         else:
