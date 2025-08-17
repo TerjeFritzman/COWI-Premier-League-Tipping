@@ -27,39 +27,45 @@ points_system = {
 # Function to get live Premier League table from API-Football
 # @st.cache_data(ttl=3600)  # Cache data for 1 hour (3600 seconds)
 def get_live_table():
-    url = "https://v3.football.api-sports.io/standings?season=2024&league=39"
+    url = "https://api.football-data.org/v4/competitions/PL/standings"
     headers = {
-        "x-apisports-key": API_football_API_Key
+        "X-Auth-Token": API_football_API_Key
     }
     response = requests.get(url, headers=headers)
-    
     if response.status_code == 200:
         data = response.json()
-
-        # Check if 'response' key exists and is not empty
-        if 'response' in data and len(data['response']) > 0:
-            standings = data['response'][0]['league']['standings'][0]
-            table = pd.DataFrame(standings)
-            table = table[['rank', 'team', 'points', 'all']]
-            table.columns = ['Position', 'Team', 'Points', 'All']
-            table['Team'] = table['Team'].apply(lambda x: x['name'])
-            table['Played'] = table['All'].apply(lambda x: x['played'])
-            table['Won'] = table['All'].apply(lambda x: x['win'])
-            table['Draw'] = table['All'].apply(lambda x: x['draw'])
-            table['Lost'] = table['All'].apply(lambda x: x['lose'])
-            table['Goals For'] = table['All'].apply(lambda x: x['goals']['for'])
-            table['Goals Against'] = table['All'].apply(lambda x: x['goals']['against'])
-            table['+/-'] = table['Goals For'] - table['Goals Against']
-
-            # Rearrange columns to match your required order
-            table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', '+/-', 'Points']]
-
-            return table
+        # Check if standings data exists
+        if 'standings' in data and len(data['standings']) > 0:
+            # Find the standings for the league table (type: TOTAL)
+            league_table = None
+            for s in data['standings']:
+                if s.get('type') == 'TOTAL':
+                    league_table = s.get('table')
+                    break
+            if league_table:
+                table = pd.DataFrame(league_table)
+                # Extract team name and stats
+                table['Team'] = table['team'].apply(lambda x: x['name'])
+                table['Position'] = table['position']
+                table['Played'] = table['playedGames']
+                table['Won'] = table['won']
+                table['Draw'] = table['draw']
+                table['Lost'] = table['lost']
+                table['Goals For'] = table['goalsFor']
+                table['Goals Against'] = table['goalsAgainst']
+                table['+/-'] = table['Goals For'] - table['Goals Against']
+                table['Points'] = table['points']
+                # Rearrange columns
+                table = table[['Position', 'Team', 'Played', 'Won', 'Draw', 'Lost', '+/-', 'Points']]
+                return table
+            else:
+                st.error("No league table data available.")
+                return pd.DataFrame()
         else:
             st.error("No standings data available.")
             return pd.DataFrame()
     else:
-        st.error("Failed to fetch data.")
+        st.error(f"Failed to fetch data. Status code: {response.status_code}")
         return pd.DataFrame()
 
 # Convert predictions to DataFrame
