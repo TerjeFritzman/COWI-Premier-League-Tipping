@@ -86,6 +86,7 @@ col1, col2 = st.columns([1, 2])
 with col1:
     st.header('Nåværende stilling')
     live_table = get_live_table()
+    
     if not live_table.empty:
         st.dataframe(live_table.set_index('Position'), height=738, width=600)  
     else:
