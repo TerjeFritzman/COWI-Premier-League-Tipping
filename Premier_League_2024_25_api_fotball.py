@@ -1,14 +1,17 @@
 import streamlit as st
 import pandas as pd
 import requests
-from predictions import predictions_data
 
-# from config import API_football_API_Key
+from predictions import predictions_data
 
 # Set page configuration to use wide layout
 st.set_page_config(layout='wide')
 
-API_football_API_Key = st.secrets['API_football_API_Key']
+# Try to get API key from Streamlit secrets (for online), else from config.py (for local)
+try:
+    API_football_API_Key = st.secrets['API_football_API_Key']
+except Exception:
+    from config import API_football_API_Key
 
 # Define the points system based on ranking
 points_system = {

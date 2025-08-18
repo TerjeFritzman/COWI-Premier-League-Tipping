@@ -1,6 +1,6 @@
 # Folders/Files
 config.py
-
+.streamlit/secrets.toml
 
 # Extensions
 *.pkl
