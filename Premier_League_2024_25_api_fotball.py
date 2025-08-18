@@ -202,9 +202,11 @@ with col2:
                 predicted_range = get_range_for_position(i+1)
                 actual_range = get_range_for_position(actual_position)
                 if predicted_team == actual_team:
-                    styles.append('background-color: #008000')  # dark green for exact match
+                    # Darker green for exact match, white text
+                    styles.append('background-color: #14532d; color: #fff')  # very dark green
                 elif predicted_range == actual_range:
-                    styles.append('background-color: #90ee90')  # light green for in-range
+                    # Slightly darker green for in-range, white text
+                    styles.append('background-color: #238a4b; color: #fff')
                 else:
                     styles.append('')
             else:
