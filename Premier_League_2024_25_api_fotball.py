@@ -132,7 +132,7 @@ def calculate_points(predictions, live_table):
     return points
 
 # Streamlit app
-st.title('Premier League Tabell 2024-2025')
+st.title('Premier League Tabell 2025-2026')
 
 # Create two columns
 col1, col2 = st.columns([1, 2])
