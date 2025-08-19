@@ -152,6 +152,41 @@ with col2:
 
     # Calculate points for each participant
     points_data = {name: calculate_points(predictions, live_table) for name, predictions in predictions_df.items()}
+
+    # --- Save standings history if changed ---
+    import os
+    from datetime import date
+    hist_path = "standings_history.csv"
+    today_str = date.today().isoformat()
+    # Prepare new standings DataFrame
+    standings = pd.DataFrame([
+        {"date": today_str, "participant": name, "points": points}
+        for name, points in points_data.items()
+    ])
+    # Assign rank (1 = most points)
+    standings = standings.sort_values("points", ascending=False)
+    standings["rank"] = range(1, len(standings)+1)
+    standings = standings[["date", "participant", "rank", "points"]]
+
+    # Load existing history if present
+    if os.path.exists(hist_path):
+        hist_df = pd.read_csv(hist_path)
+    else:
+        hist_df = pd.DataFrame(columns=["date", "participant", "rank", "points"])
+
+    # For each participant, only add if different from last entry
+    rows_to_add = []
+    for _, row in standings.iterrows():
+        part = row["participant"]
+        # Get last entry for this participant
+        prev = hist_df[hist_df["participant"] == part].sort_values("date").tail(1)
+        if prev.empty or (prev.iloc[0]["points"] != row["points"] or prev.iloc[0]["rank"] != row["rank"]):
+            rows_to_add.append(row)
+
+    if rows_to_add:
+        # Append and save
+        hist_df = pd.concat([hist_df, pd.DataFrame(rows_to_add)], ignore_index=True)
+        hist_df.to_csv(hist_path, index=False)
     points_df = pd.DataFrame.from_dict(points_data, orient='index', columns=['Sum poeng'])
 
 
@@ -254,3 +289,23 @@ with col2:
             ]
             points_system_df = pd.DataFrame(points_table, columns=["Plassering", "Poeng"])
             st.dataframe(points_system_df, hide_index=True, use_container_width=True)
+
+# --- Show ranking over time graph ---
+import altair as alt
+import os
+
+if os.path.exists("standings_history.csv"):
+    st.subheader("Utvikling i poeng over tid")
+    hist_df = pd.read_csv("standings_history.csv")
+    # Convert date to datetime for better plotting
+    hist_df["date"] = pd.to_datetime(hist_df["date"])
+    # Plot: y-axis is points
+    chart = alt.Chart(hist_df).mark_line(point=True).encode(
+        x=alt.X('date:T', title='Dato'),
+        y=alt.Y('points:Q', title='Poeng'),
+        color=alt.Color('participant:N', title='Deltaker'),
+        tooltip=['participant', 'date', 'rank', 'points']
+    ).properties(width=800, height=400)
+    st.altair_chart(chart, use_container_width=True)
+else:
+    st.info("Ingen historiske data for plassering tilgjengelig.")
