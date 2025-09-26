@@ -153,7 +153,7 @@ with col2:
     # Calculate points for each participant
     points_data = {name: calculate_points(predictions, live_table) for name, predictions in predictions_df.items()}
 
-    # --- Save standings history if changed ---
+    # --- Always save a full snapshot for all participants for each date ---
     import os
     from datetime import date
     hist_path = "standings_history.csv"
@@ -174,18 +174,12 @@ with col2:
     else:
         hist_df = pd.DataFrame(columns=["date", "participant", "rank", "points"])
 
-    # For each participant, only add if different from last entry
-    rows_to_add = []
-    for _, row in standings.iterrows():
-        part = row["participant"]
-        # Get last entry for this participant
-        prev = hist_df[hist_df["participant"] == part].sort_values("date").tail(1)
-        if prev.empty or (prev.iloc[0]["points"] != row["points"] or prev.iloc[0]["rank"] != row["rank"]):
-            rows_to_add.append(row)
-
-    if rows_to_add:
-        # Append and save
-        hist_df = pd.concat([hist_df, pd.DataFrame(rows_to_add)], ignore_index=True)
+    # Check if today's snapshot already exists for all participants
+    today_participants = set(hist_df[hist_df["date"] == today_str]["participant"])
+    new_participants = set(standings["participant"])
+    # Only add snapshot if at least one participant is missing for today
+    if today_participants != new_participants:
+        hist_df = pd.concat([hist_df, standings], ignore_index=True)
         hist_df.to_csv(hist_path, index=False)
     points_df = pd.DataFrame.from_dict(points_data, orient='index', columns=['Sum poeng'])
 
